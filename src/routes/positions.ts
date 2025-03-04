@@ -13,14 +13,28 @@ positions.get('/', async (c) => {
     const positions = await positionService.getAllPositions();
     console.log('Positions from database:', positions); // Debug log
 
-    // Build the hierarchy
+    // // Build the hierarchy
     const hierarchy = buildHierarchy(positions);
 
     // Return the hierarchical data
-    return c.json(hierarchy);
+    return c.json({hierarchy}
+    );
   } catch (error) {
     console.error('Error in GET /positions:', error);
     return c.json({ error: 'Error fetching positions' }, 500);
+  }
+});
+
+
+positions.get('/:id', async (c) => {
+  try {
+    const id = parseInt(c.req.param('id'), 10);
+    const position = await positionService.getPositionById(id);
+
+    return c.json(position);
+  } catch (error) {
+    console.error('Error in GET /positions/:id:', error);
+    return c.json({ error: 'Error fetching position' }, 500);
   }
 });
 
