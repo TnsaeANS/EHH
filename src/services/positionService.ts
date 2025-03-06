@@ -59,4 +59,43 @@ export class PositionService {
       .execute();
     return result.length > 0;
   }
+
+  async deleteAllPositions(id: number): Promise<void> {
+    // Fetch all children of the parent recursively
+    const children = await this.getAllChildren(id);
+  
+    // Delete all children first
+    for (const child of children) {
+      await this.deleteAllPositions(child.id);
+    }
+  
+    // Delete the parent
+    await db
+      .delete(positionSchema)
+      .where(eq(positionSchema.id, id))
+      .execute();
+  }
+  
+  private async getAllChildren(parentId: number): Promise<any[]> {
+    return await db
+      .select()
+      .from(positionSchema)
+      .where(eq(positionSchema.parent_id, parentId))
+      .execute();
+  }
+
+  async makeChildrenFathers(parentId: number): Promise<void> {
+    await db
+      .update(positionSchema)
+      .set({ parent_id: null })
+      .where(eq(positionSchema.parent_id, parentId))
+      .execute();
+  
+    // Finally, delete the parent itself
+    await db
+      .delete(positionSchema)
+      .where(eq(positionSchema.id, parentId))
+      .execute();
+  }
 }
+

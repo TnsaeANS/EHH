@@ -1,5 +1,3 @@
-// src/routes/positions.ts
-
 import { Hono } from 'hono';
 import { PositionService } from '../services/positionService.js';
 import { buildHierarchy } from '../utils/hierarchyUtils.js';
@@ -13,18 +11,16 @@ positions.get('/', async (c) => {
     const positions = await positionService.getAllPositions();
     console.log('Positions from database:', positions); // Debug log
 
-    // // Build the hierarchy
+    // Build the hierarchy
     const hierarchy = buildHierarchy(positions);
 
     // Return the hierarchical data
-    return c.json({hierarchy}
-    );
+    return c.json({ hierarchy });
   } catch (error) {
     console.error('Error in GET /positions:', error);
     return c.json({ error: 'Error fetching positions' }, 500);
   }
 });
-
 
 positions.get('/:id', async (c) => {
   try {
@@ -67,6 +63,32 @@ positions.put('/:id', async (c) => {
   } catch (error) {
     console.error('Error in PUT /positions/:id:', error);
     return c.json({ error: 'Error updating position' }, 500);
+  }
+});
+
+// Delete the parent and its children
+positions.delete('/:id/delete-all', async (c) => {
+  const id = parseInt(c.req.param('id'), 10);
+
+  try {
+    await positionService.deleteAllPositions(id);
+    return c.json({ message: 'Parent and all its children deleted successfully' });
+  } catch (error) {
+    console.error('Error in DELETE /positions/:id/delete-all:', error);
+    return c.json({ error: 'Error deleting parent and children' }, 500);
+  }
+});
+
+// Delete the parent only and make its children fathers
+positions.patch('/:id/make-fathers', async (c) => {
+  const id = parseInt(c.req.param('id'), 10);
+
+  try {
+    await positionService.makeChildrenFathers(id);
+    return c.json({ message: 'Parent deleted and children are now null' });
+  } catch (error) {
+    console.error('Error in PATCH /positions/:id/make-fathers:', error);
+    return c.json({ error: 'Error making children parents' }, 500);
   }
 });
 
