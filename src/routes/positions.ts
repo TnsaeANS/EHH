@@ -9,7 +9,7 @@ positions.get('/', async (c) => {
   try {
     // Fetch all positions
     const positions = await positionService.getAllPositions();
-    console.log('Positions from database:', positions); // Debug log
+    console.log('Positions from database:', positions);
 
     // Build the hierarchy
     const hierarchy = buildHierarchy(positions);

@@ -74,6 +74,7 @@ export class PositionService {
       .delete(positionSchema)
       .where(eq(positionSchema.id, id))
       .execute();
+await this.getHierarchy();
   }
   
   private async getAllChildren(parentId: number): Promise<any[]> {
@@ -84,18 +85,30 @@ export class PositionService {
       .execute();
   }
 
-  async makeChildrenFathers(parentId: number): Promise<void> {
+  async makeChildrenFathers(parentId: number): Promise<any> {
+    // Update children to have no parent
     await db
       .update(positionSchema)
       .set({ parent_id: null })
       .where(eq(positionSchema.parent_id, parentId))
       .execute();
   
-    // Finally, delete the parent itself
+    // Delete the parent
     await db
       .delete(positionSchema)
       .where(eq(positionSchema.id, parentId))
       .execute();
+  
+    // Fetch and return the updated hierarchy
+    const updatedHierarchy = await this.getHierarchy();
+    return updatedHierarchy;
+  }
+  
+  private async getHierarchy(): Promise<any[]> {
+    // Fetch the entire hierarchy from the database
+    return await db
+      .select()
+      .from(positionSchema)
+      .execute();
   }
 }
-
