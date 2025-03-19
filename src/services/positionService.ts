@@ -1,6 +1,6 @@
 // src/services/positionService.ts
 
-import { db } from '../db/index.js'; // Adjust the import to reference the index file
+import { db } from '../db/index.js'; 
 import { positionSchema } from '../db/schema.js';
 import type { Position } from '../types/positionTypes.js'; // Adjust the import path as necessary
 import { eq } from "drizzle-orm";

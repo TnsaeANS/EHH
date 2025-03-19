@@ -10,7 +10,7 @@ export function buildHierarchy(positions: Position[]): PositionNode[] {
     positionMap[position.id] = { ...position, children: [] };
   });
 
-  // Build the hierarchy
+  // Build the hierarchy and add parent_name
   const hierarchy: PositionNode[] = [];
   positions.forEach((position) => {
     if (position.parent_id === null) {
@@ -19,7 +19,10 @@ export function buildHierarchy(positions: Position[]): PositionNode[] {
     } else {
       // This is a child position
       if (positionMap[position.parent_id]) {
-        positionMap[position.parent_id].children?.push(positionMap[position.id]);
+        positionMap[position.parent_id].children?.push({
+          ...positionMap[position.id],
+          parent_name: positionMap[position.parent_id].name, // Add parent_name
+        });
       }
     }
   });
